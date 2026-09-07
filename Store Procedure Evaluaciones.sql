@@ -17,7 +17,7 @@ BEGIN
     SELECT
         id,
         nombre,
-        estado,
+        activo,
         fecha_creacion,
         fecha_actualizacion
     FROM rol
@@ -40,11 +40,11 @@ BEGIN
     SELECT
         id,
         nombre,
-        estado,
+        activo,
         fecha_creacion,
         fecha_actualizacion
     FROM rol
-    WHERE estado = 1
+    WHERE activo = 1
     ORDER BY nombre;
 
 END $$
@@ -64,7 +64,7 @@ BEGIN
     SELECT
         id,
         nombre,
-        estado,
+        activo,
         fecha_creacion,
         fecha_actualizacion
     FROM rol
@@ -89,7 +89,7 @@ BEGIN
     SELECT
         id,
         nombre,
-        estado,
+        activo,
         fecha_creacion,
         fecha_actualizacion
     FROM rol
@@ -144,20 +144,20 @@ END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CAMBIAR ESTADO ROL
+-- CAMBIAR activo ROL
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_rol;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_rol;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_rol(
+CREATE PROCEDURE sp_cambiar_activo_rol(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE rol
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
@@ -185,10 +185,10 @@ BEGIN
         nombre,
         correo,
         contrasena,
-        estado
+        activo
     FROM usuarios
     WHERE correo = p_correo
-    AND estado = 1;
+    AND activo = 1;
 
 
     SELECT
@@ -203,8 +203,8 @@ BEGIN
         ON r.id = ur.id_rol
 
     WHERE u.correo = p_correo
-    AND ur.estado = 1
-    AND r.estado = 1;
+    AND ur.activo = 1
+    AND r.activo = 1;
 
 END $$
 
@@ -253,7 +253,7 @@ BEGIN
         u.id,
         u.nombre,
         u.correo,
-        u.estado,
+        u.activo,
 
         GROUP_CONCAT(
             r.nombre
@@ -265,23 +265,26 @@ BEGIN
 
     LEFT JOIN usuario_rol ur
         ON ur.id_usuario = u.id
-        AND ur.estado = 1
+        AND ur.activo = 1
 
     LEFT JOIN rol r
         ON r.id = ur.id_rol
-        AND r.estado = 1
+        AND r.activo = 1
 
     GROUP BY
         u.id,
         u.nombre,
         u.correo,
-        u.estado
+        u.activo
 
     ORDER BY u.nombre;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_listar_usuarios();
+
 -- //////////////////////////////////
 -- OBTENER USUARIO
 -- //////////////////////////////////
@@ -298,7 +301,7 @@ BEGIN
         id,
         nombre,
         correo,
-        estado,
+        activo,
         fecha_creacion
     FROM usuarios
     WHERE id = p_id_usuario;
@@ -313,8 +316,8 @@ BEGIN
         ON r.id = ur.id_rol
 
     WHERE ur.id_usuario = p_id_usuario
-    AND ur.estado = 1
-    AND r.estado = 1
+    AND ur.activo = 1
+    AND r.activo = 1
 
     ORDER BY r.nombre;
 
@@ -365,26 +368,26 @@ END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CAMBIAR ESTADO USUARIO
+-- CAMBIAR activo USUARIO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_usuario;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_usuario;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_usuario(
+CREATE PROCEDURE sp_cambiar_activo_usuario(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE usuarios
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
-CALL sp_cambiar_estado_usuario(1, 1);
+CALL sp_cambiar_activo_usuario(1, 1);
 
 -- //////////////////////////////////
 -- ASIGNAR ROL A USUARIO
@@ -408,7 +411,7 @@ BEGIN
         p_id_rol
     )
     ON DUPLICATE KEY UPDATE
-        estado = 1;
+        activo = 1;
 
 END $$
 
@@ -427,7 +430,7 @@ CREATE PROCEDURE sp_quitar_rol_usuario(
 BEGIN
 
     UPDATE usuario_rol
-    SET estado = 0
+    SET activo = 0
     WHERE id_usuario = p_id_usuario
     AND id_rol = p_id_rol;
 
@@ -455,8 +458,8 @@ BEGIN
         ON r.id = ur.id_rol
 
     WHERE ur.id_usuario = p_id_usuario
-    AND ur.estado = 1
-    AND r.estado = 1
+    AND ur.activo = 1
+    AND r.activo = 1
 
     ORDER BY r.nombre;
 
@@ -480,7 +483,7 @@ BEGIN
     SELECT
         id,
         nombre,
-        estado,
+        activo,
         fecha_creacion,
         fecha_actualizacion
     FROM departamento
@@ -488,6 +491,9 @@ BEGIN
 
 END $$
 DELIMITER ;
+
+CALL sp_listar_departamentos();
+
 
 -- //////////////////////////////////
 -- LISTAR DEPARTAMENTOS ACTIVOS
@@ -502,11 +508,11 @@ BEGIN
     SELECT
         id,
         nombre,
-        estado,
+        activo,
         fecha_creacion,
         fecha_actualizacion
     FROM departamento
-    WHERE estado = 1
+    WHERE activo = 1
     ORDER BY nombre;
 
 END $$
@@ -528,7 +534,7 @@ BEGIN
     SELECT
         id,
         nombre,
-        estado,
+        activo,
         fecha_creacion,
         fecha_actualizacion
     FROM departamento
@@ -554,7 +560,7 @@ BEGIN
     SELECT
         id,
         nombre,
-        estado,
+        activo,
         fecha_creacion,
         fecha_actualizacion
     FROM departamento
@@ -590,6 +596,8 @@ END $$
 
 DELIMITER ;
 
+CALL sp_crear_departamento('Guatemala');
+
 -- //////////////////////////////////
 -- ACTUALIZAR DEPARTAMENTO
 -- //////////////////////////////////
@@ -612,20 +620,20 @@ END $$
 DELIMITER ;
 
 -- //////////////////////////////////
--- CAMBIAR ESTADO DEPARTAMENTO
+-- CAMBIAR activo DEPARTAMENTO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_departamento;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_departamento;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_departamento(
+CREATE PROCEDURE sp_cambiar_activo_departamento(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE departamento
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
@@ -634,7 +642,6 @@ DELIMITER ;
 -- =====================================================
 -- MUNICIPIOS
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- LISTAR MUNICIPIOS
@@ -651,13 +658,11 @@ BEGIN
         m.nombre,
         m.id_departamento,
         d.nombre AS departamento,
-        m.estado
+        m.activo
     FROM municipio m
 
     INNER JOIN departamento d
         ON d.id = m.id_departamento
-
-    WHERE m.estado = 1
 
     ORDER BY
         d.nombre,
@@ -666,6 +671,74 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- //////////////////////////////////
+-- LISTAR MUNICIPIOS ACTIVOS
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_municipios_activos;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_municipios_activos()
+BEGIN
+
+    SELECT
+        m.id,
+        m.nombre,
+        m.id_departamento,
+        d.nombre AS departamento,
+        m.activo
+    FROM municipio m
+
+    INNER JOIN departamento d
+        ON d.id = m.id_departamento
+
+    WHERE m.activo = 1
+
+    ORDER BY
+        d.nombre,
+        m.nombre;
+
+END $$
+
+DELIMITER ;
+
+CALL sp_listar_municipios_activos();
+
+-- //////////////////////////////////
+-- LISTAR MUNICIPIOS POR ID
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_municipios_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_municipios_id(
+    IN id_municipio BIGINT
+)
+BEGIN
+
+    SELECT
+        m.id,
+        m.nombre,
+        m.id_departamento,
+        d.nombre AS departamento,
+        m.activo
+
+    FROM municipio m
+
+    INNER JOIN departamento d
+        ON d.id = m.id_departamento
+
+    WHERE m.id = id_municipio
+    AND m.activo = 1
+    AND d.activo = 1
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
 -- //////////////////////////////////
 -- LISTAR MUNICIPIOS POR DEPARTAMENTO
 -- //////////////////////////////////
@@ -684,7 +757,7 @@ BEGIN
         id_departamento
     FROM municipio
     WHERE id_departamento = p_id_departamento
-    AND estado = 1
+    AND activo = 1
     ORDER BY nombre;
 
 END $$
@@ -717,6 +790,9 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+CALL sp_crear_municipio(1, 'Villa Canales');
+
 -- //////////////////////////////////
 -- ACTUALIZAR MUNICIPIO
 -- //////////////////////////////////
@@ -741,20 +817,20 @@ END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CAMBIAR ESTADO MUNICIPIO
+-- CAMBIAR activo MUNICIPIO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_municipio;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_municipio;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_municipio(
+CREATE PROCEDURE sp_cambiar_activo_municipio(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE municipio
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
@@ -763,7 +839,6 @@ DELIMITER ;
 -- =====================================================
 -- INDUSTRIAS
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- LISTAR INDUSTRIAS
@@ -780,14 +855,73 @@ BEGIN
         nombre,
         correo,
         descripcion,
-        estado
+        activo,
+        fecha_creacion,
+        fecha_actualizacion
     FROM industria
-    WHERE estado = 1
     ORDER BY nombre;
 
 END $$
 
 DELIMITER ;
+
+
+-- //////////////////////////////////
+-- LISTAR INDUSTRIAS ACTIVAS
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_industrias_activas;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_industrias_activas()
+BEGIN
+
+    SELECT
+        id,
+        nombre,
+        correo,
+        descripcion,
+        activo,
+        fecha_creacion,
+        fecha_actualizacion
+    FROM industria
+    WHERE activo = 1
+    ORDER BY nombre;
+
+END $$
+
+DELIMITER ;
+
+
+-- //////////////////////////////////
+-- LISTAR INDUSTRIA POR ID
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_industrias_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_industrias_id(
+    IN id_industria BIGINT
+)
+BEGIN
+
+    SELECT
+        id,
+        nombre,
+        correo,
+        descripcion,
+        activo,
+        fecha_creacion,
+        fecha_actualizacion
+    FROM industria
+    WHERE id = id_industria
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
+
 -- //////////////////////////////////
 -- CREAR INDUSTRIA
 -- //////////////////////////////////
@@ -818,6 +952,9 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+CALL sp_crear_industria('prueba 1','','pruebas de industrias');
+
 -- //////////////////////////////////
 -- ACTUALIZAR INDUSTRIA
 -- //////////////////////////////////
@@ -843,26 +980,29 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
--- CAMBIAR ESTADO INDUSTRIA
+-- CAMBIAR activo INDUSTRIA
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_industria;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_industria;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_industria(
+CREATE PROCEDURE sp_cambiar_activo_industria(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE industria
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
 -- =====================================================
 -- CLIENTES
 -- =====================================================
@@ -884,19 +1024,90 @@ BEGIN
         c.telefono,
         c.id_industria,
         i.nombre AS industria,
-        c.estado
+        c.activo,
+        c.fecha_creacion,
+        c.fecha_actualizacion
     FROM cliente c
 
     INNER JOIN industria i
         ON i.id = c.id_industria
-
-    WHERE c.estado = 1
 
     ORDER BY c.nombre;
 
 END $$
 
 DELIMITER ;
+
+
+-- //////////////////////////////////
+-- LISTAR CLIENTES ACTIVOS
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_clientes_activos;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_clientes_activos()
+BEGIN
+
+    SELECT
+        c.id,
+        c.nombre,
+        c.telefono,
+        c.id_industria,
+        i.nombre AS industria,
+        c.activo,
+        c.fecha_creacion,
+        c.fecha_actualizacion
+    FROM cliente c
+
+    INNER JOIN industria i
+        ON i.id = c.id_industria
+
+    WHERE c.activo = 1
+    AND i.activo = 1
+
+    ORDER BY c.nombre;
+
+END $$
+
+DELIMITER ;
+
+
+-- //////////////////////////////////
+-- LISTAR CLIENTE POR ID
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_clientes_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_clientes_id(
+    IN id_cliente BIGINT
+)
+BEGIN
+
+    SELECT
+        c.id,
+        c.nombre,
+        c.telefono,
+        c.id_industria,
+        i.nombre AS industria,
+        c.activo,
+        c.fecha_creacion,
+        c.fecha_actualizacion
+    FROM cliente c
+
+    INNER JOIN industria i
+        ON i.id = c.id_industria
+
+    WHERE c.id = id_cliente
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
+
 -- //////////////////////////////////
 -- LISTAR CLIENTES POR INDUSTRIA
 -- //////////////////////////////////
@@ -910,18 +1121,28 @@ CREATE PROCEDURE sp_listar_clientes_industria(
 BEGIN
 
     SELECT
-        id,
-        nombre,
-        telefono,
-        id_industria
-    FROM cliente
-    WHERE id_industria = p_id_industria
-    AND estado = 1
-    ORDER BY nombre;
+        c.id,
+        c.nombre,
+        c.telefono,
+        c.id_industria,
+        i.nombre AS industria,
+        c.activo
+    FROM cliente c
+
+    INNER JOIN industria i
+        ON i.id = c.id_industria
+
+    WHERE c.id_industria = p_id_industria
+    AND c.activo = 1
+    AND i.activo = 1
+
+    ORDER BY c.nombre;
 
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
 -- CREAR CLIENTE
 -- //////////////////////////////////
@@ -952,6 +1173,8 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
 -- ACTUALIZAR CLIENTE
 -- //////////////////////////////////
@@ -977,26 +1200,29 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
--- CAMBIAR ESTADO CLIENTE
+-- CAMBIAR activo CLIENTE
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_cliente;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_cliente;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_cliente(
+CREATE PROCEDURE sp_cambiar_activo_cliente(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE cliente
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
 -- =====================================================
 -- SUCURSALES
 -- =====================================================
@@ -1015,18 +1241,30 @@ BEGIN
     SELECT
         s.id,
         s.nombre,
+
         s.id_cliente,
         c.nombre AS cliente,
+
+        c.id_industria,
+        i.nombre AS industria,
+
         s.id_municipio,
         m.nombre AS municipio,
+
         d.id AS id_departamento,
         d.nombre AS departamento,
-        s.estado
+
+        s.activo,
+        s.fecha_creacion,
+        s.fecha_actualizacion
 
     FROM sucursal s
 
     INNER JOIN cliente c
         ON c.id = s.id_cliente
+
+    INNER JOIN industria i
+        ON i.id = c.id_industria
 
     INNER JOIN municipio m
         ON m.id = s.id_municipio
@@ -1034,13 +1272,125 @@ BEGIN
     INNER JOIN departamento d
         ON d.id = m.id_departamento
 
-    WHERE s.estado = 1
+    ORDER BY s.nombre;
+
+END $$
+
+DELIMITER ;
+
+
+-- //////////////////////////////////
+-- LISTAR SUCURSALES ACTIVAS
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_sucursales_activas;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_sucursales_activas()
+BEGIN
+
+    SELECT
+        s.id,
+        s.nombre,
+
+        s.id_cliente,
+        c.nombre AS cliente,
+
+        c.id_industria,
+        i.nombre AS industria,
+
+        s.id_municipio,
+        m.nombre AS municipio,
+
+        d.id AS id_departamento,
+        d.nombre AS departamento,
+
+        s.activo,
+        s.fecha_creacion,
+        s.fecha_actualizacion
+
+    FROM sucursal s
+
+    INNER JOIN cliente c
+        ON c.id = s.id_cliente
+
+    INNER JOIN industria i
+        ON i.id = c.id_industria
+
+    INNER JOIN municipio m
+        ON m.id = s.id_municipio
+
+    INNER JOIN departamento d
+        ON d.id = m.id_departamento
+
+    WHERE s.activo = 1
+    AND c.activo = 1
+    AND i.activo = 1
+    AND m.activo = 1
+    AND d.activo = 1
 
     ORDER BY s.nombre;
 
 END $$
 
 DELIMITER ;
+
+
+-- //////////////////////////////////
+-- LISTAR SUCURSAL POR ID
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_sucursales_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_sucursales_id(
+    IN id_sucursal BIGINT
+)
+BEGIN
+
+    SELECT
+        s.id,
+        s.nombre,
+
+        s.id_cliente,
+        c.nombre AS cliente,
+
+        c.id_industria,
+        i.nombre AS industria,
+
+        s.id_municipio,
+        m.nombre AS municipio,
+
+        d.id AS id_departamento,
+        d.nombre AS departamento,
+
+        s.activo,
+        s.fecha_creacion,
+        s.fecha_actualizacion
+
+    FROM sucursal s
+
+    INNER JOIN cliente c
+        ON c.id = s.id_cliente
+
+    INNER JOIN industria i
+        ON i.id = c.id_industria
+
+    INNER JOIN municipio m
+        ON m.id = s.id_municipio
+
+    INNER JOIN departamento d
+        ON d.id = m.id_departamento
+
+    WHERE s.id = id_sucursal
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
+
 -- //////////////////////////////////
 -- LISTAR SUCURSALES POR CLIENTE
 -- //////////////////////////////////
@@ -1056,13 +1406,22 @@ BEGIN
     SELECT
         s.id,
         s.nombre,
+
         s.id_cliente,
+        c.nombre AS cliente,
+
         s.id_municipio,
         m.nombre AS municipio,
+
         d.id AS id_departamento,
-        d.nombre AS departamento
+        d.nombre AS departamento,
+
+        s.activo
 
     FROM sucursal s
+
+    INNER JOIN cliente c
+        ON c.id = s.id_cliente
 
     INNER JOIN municipio m
         ON m.id = s.id_municipio
@@ -1071,13 +1430,18 @@ BEGIN
         ON d.id = m.id_departamento
 
     WHERE s.id_cliente = p_id_cliente
-    AND s.estado = 1
+    AND s.activo = 1
+    AND c.activo = 1
+    AND m.activo = 1
+    AND d.activo = 1
 
     ORDER BY s.nombre;
 
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
 -- CREAR SUCURSAL
 -- //////////////////////////////////
@@ -1108,6 +1472,7 @@ BEGIN
 END $$
 
 DELIMITER ;
+
 -- //////////////////////////////////
 -- ACTUALIZAR SUCURSAL
 -- //////////////////////////////////
@@ -1133,30 +1498,32 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
--- CAMBIAR ESTADO SUCURSAL
+-- CAMBIAR activo SUCURSAL
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_sucursal;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_sucursal;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_sucursal(
+CREATE PROCEDURE sp_cambiar_activo_sucursal(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE sucursal
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
 -- =====================================================
 -- TIPO CAMPO
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- LISTAR TIPOS DE CAMPO
@@ -1172,12 +1539,41 @@ BEGIN
         id,
         nombre
     FROM tipo_campo
-    WHERE estado = 1
+    WHERE activo = 1
     ORDER BY nombre;
 
 END $$
 
 DELIMITER ;
+
+-- //////////////////////////////////
+-- LISTAR TIPO CAMPO POR ID
+-- //////////////////////////////////
+
+DROP PROCEDURE IF EXISTS sp_listar_tipo_campo_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_tipo_campo_id(
+    IN p_id BIGINT
+)
+BEGIN
+
+    SELECT
+        id,
+        nombre,
+        activo
+
+    FROM tipo_campo
+
+    WHERE id = p_id
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
 -- //////////////////////////////////
 -- CREAR TIPO CAMPO
 -- //////////////////////////////////
@@ -1202,6 +1598,19 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+CALL sp_crear_tipo_campo('Text');
+CALL sp_crear_tipo_campo('Textarea');
+CALL sp_crear_tipo_campo('Number');
+CALL sp_crear_tipo_campo('Decimal');
+CALL sp_crear_tipo_campo('Date');
+CALL sp_crear_tipo_campo('Time');
+CALL sp_crear_tipo_campo('Select');
+CALL sp_crear_tipo_campo('Radio');
+CALL sp_crear_tipo_campo('Checkbox');
+CALL sp_crear_tipo_campo('Multi Select');
+CALL sp_crear_tipo_campo('Yes or No');
+
 -- //////////////////////////////////
 -- ACTUALIZAR TIPO CAMPO
 -- //////////////////////////////////
@@ -1223,83 +1632,120 @@ END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CAMBIAR ESTADO TIPO CAMPO
+-- CAMBIAR activo TIPO CAMPO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_tipo_campo;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_tipo_campo;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_tipo_campo(
+CREATE PROCEDURE sp_cambiar_activo_tipo_campo(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE tipo_campo
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
 -- =====================================================
--- DEFINICION CAMPO
+-- CAMPOS
 -- =====================================================
 
 
 -- //////////////////////////////////
--- LISTAR DEFINICIONES DE CAMPO
+-- LISTAR CAMPOS DE SECCION
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_listar_definiciones_campo;
+DROP PROCEDURE IF EXISTS sp_listar_campos_seccion;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_listar_definiciones_campo()
+CREATE PROCEDURE sp_listar_campos_seccion(
+    IN p_id_seccion BIGINT
+)
 BEGIN
 
     SELECT
-        dc.id,
-        dc.codigo,
-        dc.nombre,
-        dc.id_tipo_campo,
-        tc.nombre AS tipo_campo,
-        dc.estado
+        cf.id,
+        cf.id_seccion,
+        cf.codigo,
+        cf.etiqueta,
+        cf.texto_ayuda,
+        cf.texto_guia,
 
-    FROM definicion_campo dc
+        cf.id_tipo_campo,
+        tc.nombre AS tipo_campo,
+
+        cf.requerido,
+        cf.valor_minimo,
+        cf.valor_maximo,
+        cf.orden_visualizacion,
+        cf.activo
+
+    FROM campo_formulario cf
 
     INNER JOIN tipo_campo tc
-        ON tc.id = dc.id_tipo_campo
+        ON tc.id = cf.id_tipo_campo
 
-    WHERE dc.estado = 1
+    WHERE cf.id_seccion = p_id_seccion
+    AND cf.activo = 1
 
-    ORDER BY dc.nombre;
+    ORDER BY cf.orden_visualizacion;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_listar_campos_seccion(7);
+
 -- //////////////////////////////////
--- CREAR DEFINICION DE CAMPO
+-- CREAR CAMPO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_crear_definicion_campo;
+DROP PROCEDURE IF EXISTS sp_crear_campo;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_crear_definicion_campo(
+CREATE PROCEDURE sp_crear_campo(
+    IN p_id_seccion BIGINT,
     IN p_codigo VARCHAR(100),
-    IN p_nombre VARCHAR(150),
-    IN p_id_tipo_campo BIGINT
+    IN p_etiqueta VARCHAR(500),
+    IN p_texto_ayuda VARCHAR(500),
+    IN p_texto_guia VARCHAR(255),
+    IN p_id_tipo_campo BIGINT,
+    IN p_requerido TINYINT,
+    IN p_valor_minimo DECIMAL(12,2),
+    IN p_valor_maximo DECIMAL(12,2),
+    IN p_orden_visualizacion INT
 )
 BEGIN
 
-    INSERT INTO definicion_campo (
+    INSERT INTO campo_formulario (
+        id_seccion,
         codigo,
-        nombre,
-        id_tipo_campo
+        etiqueta,
+        texto_ayuda,
+        texto_guia,
+        id_tipo_campo,
+        requerido,
+        valor_minimo,
+        valor_maximo,
+        orden_visualizacion
     )
     VALUES (
+        p_id_seccion,
         p_codigo,
-        p_nombre,
-        p_id_tipo_campo
+        p_etiqueta,
+        p_texto_ayuda,
+        p_texto_guia,
+        p_id_tipo_campo,
+        p_requerido,
+        p_valor_minimo,
+        p_valor_maximo,
+        p_orden_visualizacion
     );
 
     SELECT LAST_INSERT_ID() AS id;
@@ -1307,55 +1753,108 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
--- ACTUALIZAR DEFINICION DE CAMPO
+-- ACTUALIZAR CAMPO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_actualizar_definicion_campo;
+DROP PROCEDURE IF EXISTS sp_actualizar_campo;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_actualizar_definicion_campo(
+CREATE PROCEDURE sp_actualizar_campo(
     IN p_id BIGINT,
     IN p_codigo VARCHAR(100),
-    IN p_nombre VARCHAR(150),
-    IN p_id_tipo_campo BIGINT
+    IN p_etiqueta VARCHAR(500),
+    IN p_texto_ayuda VARCHAR(500),
+    IN p_texto_guia VARCHAR(255),
+    IN p_id_tipo_campo BIGINT,
+    IN p_requerido TINYINT,
+    IN p_valor_minimo DECIMAL(12,2),
+    IN p_valor_maximo DECIMAL(12,2),
+    IN p_orden_visualizacion INT
 )
 BEGIN
 
-    UPDATE definicion_campo
+    UPDATE campo_formulario
+
     SET
         codigo = p_codigo,
-        nombre = p_nombre,
-        id_tipo_campo = p_id_tipo_campo
+        etiqueta = p_etiqueta,
+        texto_ayuda = p_texto_ayuda,
+        texto_guia = p_texto_guia,
+        id_tipo_campo = p_id_tipo_campo,
+        requerido = p_requerido,
+        valor_minimo = p_valor_minimo,
+        valor_maximo = p_valor_maximo,
+        orden_visualizacion = p_orden_visualizacion
+
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
--- CAMBIAR ESTADO DEFINICION CAMPO
+-- CAMBIAR ACTIVO CAMPO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_definicion_campo;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_campo;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_definicion_campo(
+CREATE PROCEDURE sp_cambiar_activo_campo(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
-    UPDATE definicion_campo
-    SET estado = p_estado
+    UPDATE campo_formulario
+
+    SET activo = p_activo
+
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
 -- =====================================================
 -- PLANTILLAS
 -- =====================================================
 
+-- //////////////////////////////////
+-- LISTAR PLANTILLA POR ID
+-- //////////////////////////////////
+
+DROP PROCEDURE IF EXISTS sp_listar_plantilla_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_plantilla_id(
+    IN p_id BIGINT
+)
+BEGIN
+
+    SELECT
+        pf.id,
+        pf.nombre,
+        pf.id_industria,
+        i.nombre AS industria,
+        pf.activo
+
+    FROM plantilla_formulario pf
+
+    INNER JOIN industria i
+        ON i.id = pf.id_industria
+
+    WHERE pf.id = p_id
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
 
 -- //////////////////////////////////
 -- LISTAR PLANTILLAS
@@ -1370,23 +1869,25 @@ BEGIN
     SELECT
         pf.id,
         pf.nombre,
-        pf.estatus,
         pf.id_industria,
         i.nombre AS industria,
-        pf.estado
+        pf.activo
 
     FROM plantilla_formulario pf
 
     INNER JOIN industria i
         ON i.id = pf.id_industria
 
-    WHERE pf.estado = 1
+    WHERE pf.activo = 1
 
     ORDER BY pf.nombre;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_listar_plantillas();
+
 -- //////////////////////////////////
 -- LISTAR PLANTILLAS POR INDUSTRIA
 -- //////////////////////////////////
@@ -1402,15 +1903,20 @@ BEGIN
     SELECT
         id,
         nombre,
-        estatus
+        id_industria
+
     FROM plantilla_formulario
+
     WHERE id_industria = p_id_industria
-    AND estado = 1
+    AND activo = 1
+
     ORDER BY nombre;
 
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
 -- CREAR PLANTILLA
 -- //////////////////////////////////
@@ -1420,20 +1926,17 @@ DELIMITER $$
 
 CREATE PROCEDURE sp_crear_plantilla(
     IN p_id_industria BIGINT,
-    IN p_nombre VARCHAR(150),
-    IN p_estatus VARCHAR(50)
+    IN p_nombre VARCHAR(150)
 )
 BEGIN
 
     INSERT INTO plantilla_formulario (
         id_industria,
-        nombre,
-        estatus
+        nombre
     )
     VALUES (
         p_id_industria,
-        p_nombre,
-        p_estatus
+        p_nombre
     );
 
     SELECT LAST_INSERT_ID() AS id;
@@ -1441,6 +1944,8 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
 -- ACTUALIZAR PLANTILLA
 -- //////////////////////////////////
@@ -1451,45 +1956,50 @@ DELIMITER $$
 CREATE PROCEDURE sp_actualizar_plantilla(
     IN p_id BIGINT,
     IN p_id_industria BIGINT,
-    IN p_nombre VARCHAR(150),
-    IN p_estatus VARCHAR(50)
+    IN p_nombre VARCHAR(150)
 )
+
 BEGIN
 
     UPDATE plantilla_formulario
+
     SET
         id_industria = p_id_industria,
-        nombre = p_nombre,
-        estatus = p_estatus
+        nombre = p_nombre
+
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_actualizar_plantilla(1, 4, 'Evaluación de Seguridad Bancaria');
+
 -- //////////////////////////////////
--- CAMBIAR ESTADO PLANTILLA
+-- CAMBIAR ACTIVO PLANTILLA
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_plantilla;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_plantilla;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_plantilla(
-    IN p_id BIGINT,
-    IN p_estado TINYINT
-)
+CREATE PROCEDURE sp_cambiar_activo_plantilla(IN p_id BIGINT, IN p_activo TINYINT)
+    
 BEGIN
 
     UPDATE plantilla_formulario
-    SET estado = p_estado
+
+    SET activo = p_activo
+
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_cambiar_activo_plantilla(2,0);
 -- =====================================================
 -- DOCUMENTOS
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- LISTAR DOCUMENTOS DE PLANTILLA
@@ -1498,9 +2008,8 @@ DROP PROCEDURE IF EXISTS sp_listar_documentos_plantilla;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_listar_documentos_plantilla(
-    IN p_id_plantilla BIGINT
-)
+CREATE PROCEDURE sp_listar_documentos_plantilla(IN p_id_plantilla BIGINT)
+
 BEGIN
 
     SELECT
@@ -1512,12 +2021,48 @@ BEGIN
         orden_visualizacion
     FROM documento_formulario
     WHERE id_plantilla = p_id_plantilla
-    AND estado = 1
+    AND activo = 1
     ORDER BY orden_visualizacion;
 
 END $$
 
 DELIMITER ;
+
+-- //////////////////////////////////
+-- LISTAR DOCUMENTO POR ID
+-- //////////////////////////////////
+
+DROP PROCEDURE IF EXISTS sp_listar_documento_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_documento_id(IN p_id BIGINT)
+
+BEGIN
+
+    SELECT
+        d.id,
+        d.id_plantilla,
+        pf.nombre AS plantilla,
+        d.codigo,
+        d.nombre,
+        d.descripcion,
+        d.orden_visualizacion,
+        d.activo
+
+    FROM documento_formulario d
+
+    INNER JOIN plantilla_formulario pf
+        ON pf.id = d.id_plantilla
+
+    WHERE d.id = p_id
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
 -- //////////////////////////////////
 -- CREAR DOCUMENTO
 -- //////////////////////////////////
@@ -1561,13 +2106,8 @@ DROP PROCEDURE IF EXISTS sp_actualizar_documento;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_actualizar_documento(
-    IN p_id BIGINT,
-    IN p_codigo VARCHAR(100),
-    IN p_nombre VARCHAR(150),
-    IN p_descripcion VARCHAR(255),
-    IN p_orden_visualizacion INT
-)
+CREATE PROCEDURE sp_actualizar_documento(IN p_id BIGINT, IN p_codigo VARCHAR(100), IN p_nombre VARCHAR(150), IN p_descripcion VARCHAR(255), IN p_orden_visualizacion INT)
+
 BEGIN
 
     UPDATE documento_formulario
@@ -1582,20 +2122,20 @@ END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CAMBIAR ESTADO DOCUMENTO
+-- CAMBIAR activo DOCUMENTO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_documento;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_documento;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_documento(
+CREATE PROCEDURE sp_cambiar_activo_documento(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE documento_formulario
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
@@ -1612,9 +2152,7 @@ DROP PROCEDURE IF EXISTS sp_listar_secciones_documento;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_listar_secciones_documento(
-    IN p_id_documento BIGINT
-)
+CREATE PROCEDURE sp_listar_secciones_documento(IN p_id_documento BIGINT)
 BEGIN
 
     SELECT
@@ -1626,12 +2164,48 @@ BEGIN
         orden_visualizacion
     FROM seccion_formulario
     WHERE id_documento = p_id_documento
-    AND estado = 1
+    AND activo = 1
     ORDER BY orden_visualizacion;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_listar_secciones_documento(6);
+-- //////////////////////////////////
+-- LISTAR SECCION POR ID
+-- //////////////////////////////////
+
+DROP PROCEDURE IF EXISTS sp_listar_seccion_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_seccion_id(IN p_id BIGINT)
+BEGIN
+
+    SELECT
+        s.id,
+        s.id_documento,
+        d.nombre AS documento,
+        s.nombre,
+        s.icono,
+        s.numero_columnas,
+        s.orden_visualizacion,
+        s.activo
+
+    FROM seccion_formulario s
+
+    INNER JOIN documento_formulario d
+        ON d.id = s.id_documento
+
+    WHERE s.id = p_id
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
 -- //////////////////////////////////
 -- CREAR SECCION
 -- //////////////////////////////////
@@ -1696,33 +2270,80 @@ END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CAMBIAR ESTADO SECCION
+-- CAMBIAR activo SECCION
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_seccion;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_seccion;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_seccion(
-    IN p_id BIGINT,
-    IN p_estado TINYINT
-)
+CREATE PROCEDURE sp_cambiar_activo_seccion(IN p_id BIGINT, IN p_activo TINYINT)
 BEGIN
 
     UPDATE seccion_formulario
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
 -- =====================================================
 -- CAMPOS
 -- =====================================================
+
+-- //////////////////////////////////
+-- LISTAR CAMPO POR ID
+-- //////////////////////////////////
+
+DROP PROCEDURE IF EXISTS sp_listar_campo_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_campo_id(
+    IN p_id BIGINT
+)
+BEGIN
+
+    SELECT
+        cf.id,
+        cf.id_seccion,
+        s.nombre AS seccion,
+
+        cf.codigo,
+        cf.etiqueta,
+        cf.texto_ayuda,
+        cf.texto_guia,
+
+        cf.id_tipo_campo,
+        tc.nombre AS tipo_campo,
+
+        cf.requerido,
+        cf.valor_minimo,
+        cf.valor_maximo,
+        cf.orden_visualizacion,
+        cf.activo
+
+    FROM campo_formulario cf
+
+    INNER JOIN seccion_formulario s
+        ON s.id = cf.id_seccion
+
+    INNER JOIN tipo_campo tc
+        ON tc.id = cf.id_tipo_campo
+
+    WHERE cf.id = p_id
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
 
 
 -- //////////////////////////////////
 -- LISTAR CAMPOS DE SECCION
 -- //////////////////////////////////
+
 DROP PROCEDURE IF EXISTS sp_listar_campos_seccion;
 
 DELIMITER $$
@@ -1735,38 +2356,40 @@ BEGIN
     SELECT
         cf.id,
         cf.id_seccion,
+
         cf.codigo,
         cf.etiqueta,
         cf.texto_ayuda,
         cf.texto_guia,
-        cf.id_definicion_campo,
-        dc.nombre AS definicion_campo,
-        tc.id AS id_tipo_campo,
+
+        cf.id_tipo_campo,
         tc.nombre AS tipo_campo,
+
         cf.requerido,
         cf.valor_minimo,
         cf.valor_maximo,
-        cf.orden_visualizacion
+        cf.orden_visualizacion,
+        cf.activo
 
     FROM campo_formulario cf
 
-    INNER JOIN definicion_campo dc
-        ON dc.id = cf.id_definicion_campo
-
     INNER JOIN tipo_campo tc
-        ON tc.id = dc.id_tipo_campo
+        ON tc.id = cf.id_tipo_campo
 
     WHERE cf.id_seccion = p_id_seccion
-    AND cf.estado = 1
+    AND cf.activo = 1
 
     ORDER BY cf.orden_visualizacion;
 
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
 -- CREAR CAMPO
 -- //////////////////////////////////
+
 DROP PROCEDURE IF EXISTS sp_crear_campo;
 
 DELIMITER $$
@@ -1777,7 +2400,7 @@ CREATE PROCEDURE sp_crear_campo(
     IN p_etiqueta VARCHAR(500),
     IN p_texto_ayuda VARCHAR(500),
     IN p_texto_guia VARCHAR(255),
-    IN p_id_definicion_campo BIGINT,
+    IN p_id_tipo_campo BIGINT,
     IN p_requerido TINYINT,
     IN p_valor_minimo DECIMAL(12,2),
     IN p_valor_maximo DECIMAL(12,2),
@@ -1791,7 +2414,7 @@ BEGIN
         etiqueta,
         texto_ayuda,
         texto_guia,
-        id_definicion_campo,
+        id_tipo_campo,
         requerido,
         valor_minimo,
         valor_maximo,
@@ -1803,7 +2426,7 @@ BEGIN
         p_etiqueta,
         p_texto_ayuda,
         p_texto_guia,
-        p_id_definicion_campo,
+        p_id_tipo_campo,
         p_requerido,
         p_valor_minimo,
         p_valor_maximo,
@@ -1815,9 +2438,12 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
 -- ACTUALIZAR CAMPO
 -- //////////////////////////////////
+
 DROP PROCEDURE IF EXISTS sp_actualizar_campo;
 
 DELIMITER $$
@@ -1828,7 +2454,7 @@ CREATE PROCEDURE sp_actualizar_campo(
     IN p_etiqueta VARCHAR(500),
     IN p_texto_ayuda VARCHAR(500),
     IN p_texto_guia VARCHAR(255),
-    IN p_id_definicion_campo BIGINT,
+    IN p_id_tipo_campo BIGINT,
     IN p_requerido TINYINT,
     IN p_valor_minimo DECIMAL(12,2),
     IN p_valor_maximo DECIMAL(12,2),
@@ -1837,74 +2463,108 @@ CREATE PROCEDURE sp_actualizar_campo(
 BEGIN
 
     UPDATE campo_formulario
+
     SET
         codigo = p_codigo,
         etiqueta = p_etiqueta,
         texto_ayuda = p_texto_ayuda,
         texto_guia = p_texto_guia,
-        id_definicion_campo = p_id_definicion_campo,
+        id_tipo_campo = p_id_tipo_campo,
         requerido = p_requerido,
         valor_minimo = p_valor_minimo,
         valor_maximo = p_valor_maximo,
         orden_visualizacion = p_orden_visualizacion
+
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
--- CAMBIAR ESTADO CAMPO
+-- CAMBIAR ACTIVO CAMPO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_campo;
+
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_campo;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_campo(
+CREATE PROCEDURE sp_cambiar_activo_campo(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE campo_formulario
-    SET estado = p_estado
+
+    SET
+        activo = p_activo
+
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
 -- =====================================================
 -- OPCIONES DE CAMPO
 -- =====================================================
 
-
 -- //////////////////////////////////
 -- LISTAR OPCIONES DE CAMPO
 -- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_opcion_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_opcion_id(IN p_id BIGINT)
+BEGIN
+    SELECT
+        o.id,
+        o.id_campo_formulario,
+        cf.etiqueta AS campo,
+        o.codigo,
+        o.valor,
+        o.puntaje,
+        o.etiqueta,
+        o.orden_visualizacion,
+        o.activo
+    FROM opcion_formulario o
+    INNER JOIN campo_formulario cf ON cf.id = o.id_campo_formulario
+    WHERE o.id = p_id
+    LIMIT 1;
+END $$
+
+DELIMITER ;
+
+-- //////////////////////////////////
+-- LISTAR OPCION DE CAMPO POR ID
+-- //////////////////////////////////
+
 DROP PROCEDURE IF EXISTS sp_listar_opciones_campo;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_listar_opciones_campo(
-    IN p_id_campo BIGINT
-)
+CREATE PROCEDURE sp_listar_opciones_campo(IN p_id_campo BIGINT)
 BEGIN
-
     SELECT
         id,
-        id_opcion,
+        id_campo_formulario,
         codigo,
         valor,
         puntaje,
         etiqueta,
-        orden_visualizacion
+        orden_visualizacion,
+        activo
     FROM opcion_formulario
     WHERE id_campo_formulario = p_id_campo
-    AND estado = 1
+    AND activo = 1
     ORDER BY orden_visualizacion;
-
 END $$
 
 DELIMITER ;
+
 -- //////////////////////////////////
 -- CREAR OPCION DE CAMPO
 -- //////////////////////////////////
@@ -1914,7 +2574,6 @@ DELIMITER $$
 
 CREATE PROCEDURE sp_crear_opcion_campo(
     IN p_id_campo_formulario BIGINT,
-    IN p_id_opcion BIGINT,
     IN p_codigo VARCHAR(100),
     IN p_valor VARCHAR(255),
     IN p_puntaje DECIMAL(10,2),
@@ -1922,31 +2581,27 @@ CREATE PROCEDURE sp_crear_opcion_campo(
     IN p_orden_visualizacion INT
 )
 BEGIN
-
     INSERT INTO opcion_formulario (
-        id_opcion,
+        id_campo_formulario,
         codigo,
         valor,
         puntaje,
         etiqueta,
-        orden_visualizacion,
-        id_campo_formulario
+        orden_visualizacion
     )
     VALUES (
-        p_id_opcion,
+        p_id_campo_formulario,
         p_codigo,
         p_valor,
         p_puntaje,
         p_etiqueta,
-        p_orden_visualizacion,
-        p_id_campo_formulario
+        p_orden_visualizacion
     );
-
     SELECT LAST_INSERT_ID() AS id;
-
 END $$
 
 DELIMITER ;
+
 -- //////////////////////////////////
 -- ACTUALIZAR OPCION
 -- //////////////////////////////////
@@ -1956,7 +2611,6 @@ DELIMITER $$
 
 CREATE PROCEDURE sp_actualizar_opcion_campo(
     IN p_id BIGINT,
-    IN p_id_opcion BIGINT,
     IN p_codigo VARCHAR(100),
     IN p_valor VARCHAR(255),
     IN p_puntaje DECIMAL(10,2),
@@ -1964,44 +2618,38 @@ CREATE PROCEDURE sp_actualizar_opcion_campo(
     IN p_orden_visualizacion INT
 )
 BEGIN
-
     UPDATE opcion_formulario
     SET
-        id_opcion = p_id_opcion,
         codigo = p_codigo,
         valor = p_valor,
         puntaje = p_puntaje,
         etiqueta = p_etiqueta,
         orden_visualizacion = p_orden_visualizacion
     WHERE id = p_id;
-
 END $$
 
 DELIMITER ;
+
 -- //////////////////////////////////
--- CAMBIAR ESTADO OPCION
+-- CAMBIAR activo OPCION
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_opcion;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_opcion;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_opcion(
-    IN p_id BIGINT,
-    IN p_estado TINYINT
-)
+CREATE PROCEDURE sp_cambiar_activo_opcion(IN p_id BIGINT, IN p_activo TINYINT)
 BEGIN
-
     UPDATE opcion_formulario
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
-
 END $$
 
 DELIMITER ;
+
+
 -- =====================================================
 -- TIPOS DE EVENTO
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- LISTAR TIPOS DE EVENTO
@@ -2017,60 +2665,32 @@ BEGIN
         id,
         nombre
     FROM tipo_evento
-    WHERE estado = 1
+    WHERE activo = 1
     ORDER BY nombre;
 
 END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CREAR TIPO EVENTO
+-- LISTAR TIPO EVENTO POR ID
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_crear_tipo_evento;
+DROP PROCEDURE IF EXISTS sp_listar_tipo_evento_id;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_crear_tipo_evento(
-    IN p_nombre VARCHAR(100)
-)
+CREATE PROCEDURE sp_listar_tipo_evento_id(IN p_id BIGINT)
 BEGIN
-
-    INSERT INTO tipo_evento (
-        nombre
-    )
-    VALUES (
-        p_nombre
-    );
-
-    SELECT LAST_INSERT_ID() AS id;
-
+    SELECT id, nombre, activo
+    FROM tipo_evento
+    WHERE id = p_id
+    LIMIT 1;
 END $$
 
 DELIMITER ;
--- //////////////////////////////////
--- ACTUALIZAR TIPO EVENTO
--- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_actualizar_tipo_evento;
 
-DELIMITER $$
-
-CREATE PROCEDURE sp_actualizar_tipo_evento(
-    IN p_id BIGINT,
-    IN p_nombre VARCHAR(100)
-)
-BEGIN
-
-    UPDATE tipo_evento
-    SET nombre = p_nombre
-    WHERE id = p_id;
-
-END $$
-
-DELIMITER ;
 -- =====================================================
 -- TIPOS DE ACCION
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- LISTAR TIPOS DE ACCION
@@ -2086,60 +2706,32 @@ BEGIN
         id,
         nombre
     FROM tipo_accion
-    WHERE estado = 1
+    WHERE activo = 1
     ORDER BY nombre;
 
 END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CREAR TIPO ACCION
+-- LISTAR TIPO ACCION POR ID
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_crear_tipo_accion;
+DROP PROCEDURE IF EXISTS sp_listar_tipo_accion_id;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_crear_tipo_accion(
-    IN p_nombre VARCHAR(100)
-)
+CREATE PROCEDURE sp_listar_tipo_accion_id(IN p_id BIGINT)
 BEGIN
-
-    INSERT INTO tipo_accion (
-        nombre
-    )
-    VALUES (
-        p_nombre
-    );
-
-    SELECT LAST_INSERT_ID() AS id;
-
+    SELECT id, nombre, activo
+    FROM tipo_accion
+    WHERE id = p_id
+    LIMIT 1;
 END $$
 
 DELIMITER ;
--- //////////////////////////////////
--- ACTUALIZAR TIPO ACCION
--- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_actualizar_tipo_accion;
 
-DELIMITER $$
-
-CREATE PROCEDURE sp_actualizar_tipo_accion(
-    IN p_id BIGINT,
-    IN p_nombre VARCHAR(100)
-)
-BEGIN
-
-    UPDATE tipo_accion
-    SET nombre = p_nombre
-    WHERE id = p_id;
-
-END $$
-
-DELIMITER ;
 -- =====================================================
 -- EVENTOS DE CAMPOS
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- LISTAR EVENTOS DE CAMPO
@@ -2162,7 +2754,8 @@ BEGIN
         ta.nombre AS tipo_accion,
         ecf.configuracion_condicion,
         ecf.configuracion_accion,
-        ecf.orden_visualizacion
+        ecf.orden_visualizacion,
+        ecf.activo
 
     FROM evento_campo_formulario ecf
 
@@ -2173,13 +2766,60 @@ BEGIN
         ON ta.id = ecf.id_tipo_accion
 
     WHERE ecf.id_campo_formulario = p_id_campo
-    AND ecf.estado = 1
+    AND ecf.activo = 1
 
     ORDER BY ecf.orden_visualizacion;
 
 END $$
 
 DELIMITER ;
+
+
+-- //////////////////////////////////
+-- LISTAR EVENTO DE CAMPO POR ID
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_evento_campo_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_evento_campo_id(
+    IN p_id BIGINT
+)
+BEGIN
+
+    SELECT
+        ecf.id,
+        ecf.id_campo_formulario,
+        cf.etiqueta AS campo,
+        ecf.id_tipo_evento,
+        te.nombre AS tipo_evento,
+        ecf.id_tipo_accion,
+        ta.nombre AS tipo_accion,
+        ecf.configuracion_condicion,
+        ecf.configuracion_accion,
+        ecf.orden_visualizacion,
+        ecf.activo
+
+    FROM evento_campo_formulario ecf
+
+    INNER JOIN campo_formulario cf
+        ON cf.id = ecf.id_campo_formulario
+
+    INNER JOIN tipo_evento te
+        ON te.id = ecf.id_tipo_evento
+
+    INNER JOIN tipo_accion ta
+        ON ta.id = ecf.id_tipo_accion
+
+    WHERE ecf.id = p_id
+
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
+
 -- //////////////////////////////////
 -- CREAR EVENTO DE CAMPO
 -- //////////////////////////////////
@@ -2219,6 +2859,8 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
 -- ACTUALIZAR EVENTO DE CAMPO
 -- //////////////////////////////////
@@ -2243,35 +2885,38 @@ BEGIN
         configuracion_condicion = p_configuracion_condicion,
         configuracion_accion = p_configuracion_accion,
         orden_visualizacion = p_orden_visualizacion
+
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
+
 -- //////////////////////////////////
--- CAMBIAR ESTADO EVENTO
+-- CAMBIAR ACTIVO EVENTO
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_evento;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_evento;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_evento(
+CREATE PROCEDURE sp_cambiar_activo_evento(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE evento_campo_formulario
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
 -- =====================================================
 -- FORMULARIO COMPLETO
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- OBTENER FORMULARIO COMPLETO
@@ -2289,33 +2934,28 @@ BEGIN
     SELECT
         pf.id,
         pf.nombre,
-        pf.estatus,
         pf.id_industria,
-        i.nombre AS industria
-
+        i.nombre AS industria,
+        pf.activo
     FROM plantilla_formulario pf
-
     INNER JOIN industria i
         ON i.id = pf.id_industria
-
     WHERE pf.id = p_id_plantilla;
 
 
     -- DOCUMENTOS
     SELECT
-        id,
-        id_plantilla,
-        codigo,
-        nombre,
-        descripcion,
-        orden_visualizacion
-
-    FROM documento_formulario
-
-    WHERE id_plantilla = p_id_plantilla
-    AND estado = 1
-
-    ORDER BY orden_visualizacion;
+        d.id,
+        d.id_plantilla,
+        d.codigo,
+        d.nombre,
+        d.descripcion,
+        d.orden_visualizacion,
+        d.activo
+    FROM documento_formulario d
+    WHERE d.id_plantilla = p_id_plantilla
+    AND d.activo = 1
+    ORDER BY d.orden_visualizacion;
 
 
     -- SECCIONES
@@ -2325,16 +2965,14 @@ BEGIN
         s.nombre,
         s.icono,
         s.numero_columnas,
-        s.orden_visualizacion
-
+        s.orden_visualizacion,
+        s.activo
     FROM seccion_formulario s
-
     INNER JOIN documento_formulario d
         ON d.id = s.id_documento
-
     WHERE d.id_plantilla = p_id_plantilla
-    AND s.estado = 1
-
+    AND d.activo = 1
+    AND s.activo = 1
     ORDER BY
         d.orden_visualizacion,
         s.orden_visualizacion;
@@ -2348,34 +2986,25 @@ BEGIN
         cf.etiqueta,
         cf.texto_ayuda,
         cf.texto_guia,
+        cf.id_tipo_campo,
+        tc.nombre AS tipo_campo,
         cf.requerido,
         cf.valor_minimo,
         cf.valor_maximo,
         cf.orden_visualizacion,
-
-        dc.id AS id_definicion_campo,
-        dc.nombre AS definicion_campo,
-
-        tc.id AS id_tipo_campo,
-        tc.nombre AS tipo_campo
-
+        cf.activo
     FROM campo_formulario cf
-
     INNER JOIN seccion_formulario s
         ON s.id = cf.id_seccion
-
     INNER JOIN documento_formulario d
         ON d.id = s.id_documento
-
-    INNER JOIN definicion_campo dc
-        ON dc.id = cf.id_definicion_campo
-
     INNER JOIN tipo_campo tc
-        ON tc.id = dc.id_tipo_campo
-
+        ON tc.id = cf.id_tipo_campo
     WHERE d.id_plantilla = p_id_plantilla
-    AND cf.estado = 1
-
+    AND d.activo = 1
+    AND s.activo = 1
+    AND cf.activo = 1
+    AND tc.activo = 1
     ORDER BY
         d.orden_visualizacion,
         s.orden_visualizacion,
@@ -2385,28 +3014,25 @@ BEGIN
     -- OPCIONES
     SELECT
         o.id,
-        o.id_opcion,
         o.id_campo_formulario,
         o.codigo,
         o.valor,
         o.puntaje,
         o.etiqueta,
-        o.orden_visualizacion
-
+        o.orden_visualizacion,
+        o.activo
     FROM opcion_formulario o
-
     INNER JOIN campo_formulario cf
         ON cf.id = o.id_campo_formulario
-
     INNER JOIN seccion_formulario s
         ON s.id = cf.id_seccion
-
     INNER JOIN documento_formulario d
         ON d.id = s.id_documento
-
     WHERE d.id_plantilla = p_id_plantilla
-    AND o.estado = 1
-
+    AND d.activo = 1
+    AND s.activo = 1
+    AND cf.activo = 1
+    AND o.activo = 1
     ORDER BY
         o.id_campo_formulario,
         o.orden_visualizacion;
@@ -2422,28 +3048,26 @@ BEGIN
         ta.nombre AS tipo_accion,
         ecf.configuracion_condicion,
         ecf.configuracion_accion,
-        ecf.orden_visualizacion
-
+        ecf.orden_visualizacion,
+        ecf.activo
     FROM evento_campo_formulario ecf
-
     INNER JOIN campo_formulario cf
         ON cf.id = ecf.id_campo_formulario
-
     INNER JOIN seccion_formulario s
         ON s.id = cf.id_seccion
-
     INNER JOIN documento_formulario d
         ON d.id = s.id_documento
-
     INNER JOIN tipo_evento te
         ON te.id = ecf.id_tipo_evento
-
     INNER JOIN tipo_accion ta
         ON ta.id = ecf.id_tipo_accion
-
     WHERE d.id_plantilla = p_id_plantilla
-    AND ecf.estado = 1
-
+    AND d.activo = 1
+    AND s.activo = 1
+    AND cf.activo = 1
+    AND ecf.activo = 1
+    AND te.activo = 1
+    AND ta.activo = 1
     ORDER BY
         ecf.id_campo_formulario,
         ecf.orden_visualizacion;
@@ -2451,6 +3075,7 @@ BEGIN
 END $$
 
 DELIMITER ;
+
 -- =====================================================
 -- EVALUACIONES
 -- =====================================================
@@ -2488,6 +3113,7 @@ BEGIN
 END $$
 
 DELIMITER ;
+
 -- //////////////////////////////////
 -- LISTAR EVALUACIONES
 -- //////////////////////////////////
@@ -2538,7 +3164,7 @@ BEGIN
     INNER JOIN plantilla_formulario pf
         ON pf.id = e.id_plantilla
 
-    WHERE e.estado = 1
+    WHERE e.activo = 1
 
     ORDER BY e.fecha_creacion DESC;
 
@@ -2563,88 +3189,113 @@ BEGIN
         e.observaciones,
         e.puntaje_total,
         e.nivel_riesgo,
-
-        s.id AS id_sucursal,
+        e.activo,
+        e.id_sucursal,
         s.nombre AS sucursal,
-
         c.id AS id_cliente,
         c.nombre AS cliente,
-
         i.id AS id_industria,
         i.nombre AS industria,
-
-        pf.id AS id_plantilla,
+        e.id_plantilla,
         pf.nombre AS plantilla,
-
-        u.id AS id_evaluador,
+        e.id_evaluador,
         u.nombre AS evaluador,
-
         e.fecha_creacion
 
     FROM evaluacion e
 
-    INNER JOIN sucursal s
-        ON s.id = e.id_sucursal
-
-    INNER JOIN cliente c
-        ON c.id = s.id_cliente
-
-    INNER JOIN industria i
-        ON i.id = c.id_industria
-
-    INNER JOIN plantilla_formulario pf
-        ON pf.id = e.id_plantilla
-
-    INNER JOIN usuarios u
-        ON u.id = e.id_evaluador
+    LEFT JOIN sucursal s ON s.id = e.id_sucursal
+    LEFT JOIN cliente c ON c.id = s.id_cliente
+    LEFT JOIN industria i ON i.id = c.id_industria
+    LEFT JOIN plantilla_formulario pf ON pf.id = e.id_plantilla
+    LEFT JOIN usuarios u ON u.id = e.id_evaluador
 
     WHERE e.id = p_id_evaluacion;
 
 
+    -- ==========================================
+    -- RESPUESTAS
+    -- ==========================================
     SELECT
         re.id,
         re.id_campo,
-
         cf.codigo,
         cf.etiqueta,
-
+        cf.id_tipo_campo,
         tc.nombre AS tipo_campo,
-
         re.id_opcion,
         op.etiqueta AS opcion,
         op.valor AS valor_opcion,
-
         re.valor_texto,
         re.valor_numero,
         re.valor_booleano,
         re.valor_fecha,
-
         re.puntaje,
         re.puntaje_ponderado,
         re.observacion
 
     FROM respuesta_evaluacion re
 
-    INNER JOIN campo_formulario cf
-        ON cf.id = re.id_campo
-
-    INNER JOIN definicion_campo dc
-        ON dc.id = cf.id_definicion_campo
-
-    INNER JOIN tipo_campo tc
-        ON tc.id = dc.id_tipo_campo
-
-    LEFT JOIN opcion_formulario op
-        ON op.id = re.id_opcion
-
-    WHERE re.id_evaluacion = p_id_evaluacion
-    AND re.estado = 1
+    LEFT JOIN campo_formulario cf ON cf.id = re.id_campo
+    LEFT JOIN tipo_campo tc ON tc.id = cf.id_tipo_campo
+    LEFT JOIN opcion_formulario op ON op.id = re.id_opcion
+    WHERE re.id_evaluacion = p_id_evaluacion AND re.activo = 1
 
     ORDER BY re.id;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_obtener_evaluacion(5);
+
+-- //////////////////////////////////
+-- OBTENER EVALUACION POR ID
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_obtener_evaluacion_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_obtener_evaluacion_id(
+    IN p_id_evaluacion BIGINT
+)
+BEGIN
+
+    SELECT
+        e.id,
+        e.estatus,
+        e.observaciones,
+        e.puntaje_total,
+        e.nivel_riesgo,
+        e.activo,
+        e.id_sucursal,
+        s.nombre AS sucursal,
+        c.id AS id_cliente,
+        c.nombre AS cliente,
+        i.id AS id_industria,
+        i.nombre AS industria,
+        e.id_plantilla,
+        pf.nombre AS plantilla,
+        e.id_evaluador,
+        u.nombre AS evaluador,
+        e.fecha_creacion
+
+    FROM evaluacion e
+
+    LEFT JOIN sucursal s ON s.id = e.id_sucursal
+    LEFT JOIN cliente c ON c.id = s.id_cliente
+    LEFT JOIN industria i ON i.id = c.id_industria
+    LEFT JOIN plantilla_formulario pf ON pf.id = e.id_plantilla
+    LEFT JOIN usuarios u ON u.id = e.id_evaluador
+
+    WHERE e.id = p_id_evaluacion;
+
+END $$
+
+DELIMITER ;
+
+CALL sp_obtener_evaluacion_id(5);
+
 -- //////////////////////////////////
 -- ACTUALIZAR EVALUACION
 -- //////////////////////////////////
@@ -2671,29 +3322,30 @@ END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CAMBIAR ESTADO EVALUACION
+-- CAMBIAR activo EVALUACION
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_evaluacion;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_evaluacion;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_evaluacion(
+CREATE PROCEDURE sp_cambiar_activo_evaluacion(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE evaluacion
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_cambiar_activo_evaluacion(2, 0);
 -- =====================================================
 -- RESPUESTAS DE EVALUACION
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- GUARDAR RESPUESTA
@@ -2822,7 +3474,7 @@ BEGIN
         ON op.id = re.id_opcion
 
     WHERE re.id_evaluacion = p_id_evaluacion
-    AND re.estado = 1
+    AND re.activo = 1
 
     ORDER BY re.id;
 
@@ -2851,20 +3503,20 @@ END $$
 
 DELIMITER ;
 -- //////////////////////////////////
--- CAMBIAR ESTADO RESPUESTA
+-- CAMBIAR activo RESPUESTA
 -- //////////////////////////////////
-DROP PROCEDURE IF EXISTS sp_cambiar_estado_respuesta;
+DROP PROCEDURE IF EXISTS sp_cambiar_activo_respuesta;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_cambiar_estado_respuesta(
+CREATE PROCEDURE sp_cambiar_activo_respuesta(
     IN p_id BIGINT,
-    IN p_estado TINYINT
+    IN p_activo TINYINT
 )
 BEGIN
 
     UPDATE respuesta_evaluacion
-    SET estado = p_estado
+    SET activo = p_activo
     WHERE id = p_id;
 
 END $$
@@ -2873,7 +3525,6 @@ DELIMITER ;
 -- =====================================================
 -- FINALIZAR EVALUACION
 -- =====================================================
-
 
 -- //////////////////////////////////
 -- FINALIZAR EVALUACION
@@ -2908,7 +3559,7 @@ BEGIN
     FROM respuesta_evaluacion
 
     WHERE id_evaluacion = p_id_evaluacion
-    AND estado = 1;
+    AND activo = 1;
 
 
     UPDATE evaluacion
@@ -2976,7 +3627,7 @@ BEGIN
     LEFT JOIN respuesta_evaluacion re
         ON re.id_campo = cf.id
         AND re.id_evaluacion = p_id_evaluacion
-        AND re.estado = 1
+        AND re.activo = 1
 
     INNER JOIN documento_formulario df
         ON df.id = sf.id_documento
@@ -3047,7 +3698,7 @@ BEGIN
 
     LEFT JOIN respuesta_evaluacion re
         ON re.id_evaluacion = e.id
-        AND re.estado = 1
+        AND re.activo = 1
 
     WHERE e.id = p_id_evaluacion
 
