@@ -1849,12 +1849,15 @@ BEGIN
         ON i.id = pf.id_industria
 
     WHERE pf.id = p_id
-
+	order by pf
     LIMIT 1;
 
 END $$
 
 DELIMITER ;
+
+CALL sp_listar_plantilla_id(9);
+
 
 -- //////////////////////////////////
 -- LISTAR PLANTILLAS
@@ -1880,7 +1883,7 @@ BEGIN
 
     WHERE pf.activo = 1
 
-    ORDER BY pf.nombre;
+    ORDER BY pf.id;
 
 END $$
 
@@ -3183,6 +3186,9 @@ CREATE PROCEDURE sp_obtener_evaluacion(
 )
 BEGIN
 
+    -- ==========================================
+    -- INFORMACIÓN GENERAL DE LA EVALUACIÓN
+    -- ==========================================
     SELECT
         e.id,
         e.estatus,
@@ -3190,56 +3196,90 @@ BEGIN
         e.puntaje_total,
         e.nivel_riesgo,
         e.activo,
+
         e.id_sucursal,
         s.nombre AS sucursal,
+
         c.id AS id_cliente,
         c.nombre AS cliente,
+
         i.id AS id_industria,
         i.nombre AS industria,
+
         e.id_plantilla,
         pf.nombre AS plantilla,
+
         e.id_evaluador,
         u.nombre AS evaluador,
-        e.fecha_creacion
+
+        e.fecha_creacion,
+        e.fecha_actualizacion
 
     FROM evaluacion e
 
-    LEFT JOIN sucursal s ON s.id = e.id_sucursal
-    LEFT JOIN cliente c ON c.id = s.id_cliente
-    LEFT JOIN industria i ON i.id = c.id_industria
-    LEFT JOIN plantilla_formulario pf ON pf.id = e.id_plantilla
-    LEFT JOIN usuarios u ON u.id = e.id_evaluador
+    LEFT JOIN sucursal s
+        ON s.id = e.id_sucursal
+
+    LEFT JOIN cliente c
+        ON c.id = s.id_cliente
+
+    LEFT JOIN industria i
+        ON i.id = c.id_industria
+
+    LEFT JOIN plantilla_formulario pf
+        ON pf.id = e.id_plantilla
+
+    LEFT JOIN usuarios u
+        ON u.id = e.id_evaluador
 
     WHERE e.id = p_id_evaluacion;
 
 
     -- ==========================================
-    -- RESPUESTAS
+    -- RESPUESTAS DE LA EVALUACIÓN
     -- ==========================================
     SELECT
         re.id,
+        re.id_evaluacion,
         re.id_campo,
+
         cf.codigo,
         cf.etiqueta,
         cf.id_tipo_campo,
+
         tc.nombre AS tipo_campo,
+
         re.id_opcion,
+
         op.etiqueta AS opcion,
         op.valor AS valor_opcion,
+
         re.valor_texto,
         re.valor_numero,
         re.valor_booleano,
         re.valor_fecha,
+
         re.puntaje,
         re.puntaje_ponderado,
-        re.observacion
+        re.observacion,
+
+        re.fecha_creacion,
+        re.fecha_actualizacion
 
     FROM respuesta_evaluacion re
 
-    LEFT JOIN campo_formulario cf ON cf.id = re.id_campo
-    LEFT JOIN tipo_campo tc ON tc.id = cf.id_tipo_campo
-    LEFT JOIN opcion_formulario op ON op.id = re.id_opcion
-    WHERE re.id_evaluacion = p_id_evaluacion AND re.activo = 1
+    LEFT JOIN campo_formulario cf
+        ON cf.id = re.id_campo
+
+    LEFT JOIN tipo_campo tc
+        ON tc.id = cf.id_tipo_campo
+
+    LEFT JOIN opcion_formulario op
+        ON op.id = re.id_opcion
+        AND op.id_campo_formulario = re.id_campo
+
+    WHERE re.id_evaluacion = p_id_evaluacion
+      AND re.activo = 1
 
     ORDER BY re.id;
 
@@ -3247,7 +3287,7 @@ END $$
 
 DELIMITER ;
 
-CALL sp_obtener_evaluacion(5);
+CALL sp_obtener_evaluacion(7);
 
 -- //////////////////////////////////
 -- OBTENER EVALUACION POR ID

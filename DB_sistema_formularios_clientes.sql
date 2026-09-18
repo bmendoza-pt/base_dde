@@ -88,6 +88,8 @@ CREATE TABLE cliente (
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
 
+SELECT * FROM cliente;
+
 CREATE TABLE sucursal (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL,
@@ -108,6 +110,8 @@ CREATE TABLE sucursal (
 	CONSTRAINT fk_sucursal_usuario_actualizacion
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
+
+SELECT * FROM sucursal;
 
 CREATE TABLE rol (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -160,9 +164,25 @@ CREATE TABLE tipo_campo (
 
 SELECT * FROM tipo_campo;
 
+CREATE TABLE estado_plantilla (
+	id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    activo TINYINT DEFAULT 1,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    id_usuario_creacion BIGINT NULL,
+    id_usuario_actualizacion BIGINT NULL,
+    
+	CONSTRAINT fk_estado_usuario_creacion
+        FOREIGN KEY (id_usuario_creacion) REFERENCES usuarios(id),
+	CONSTRAINT fk_estado_usuario_actualizacion
+        FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
+);
+
 CREATE TABLE plantilla_formulario (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_industria BIGINT NOT NULL,
+    id_estado BIGINT,
     nombre VARCHAR(150) NOT NULL,
     activo TINYINT DEFAULT 1,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -175,8 +195,12 @@ CREATE TABLE plantilla_formulario (
 	CONSTRAINT fk_plantilla_usuario_creacion
         FOREIGN KEY (id_usuario_creacion) REFERENCES usuarios(id),
 	CONSTRAINT fk_plantilla_usuario_actualizacion
-        FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
+        FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id),
+	CONSTRAINT fk_plantilla_estado
+		FOREIGN KEY (id_estado) REFERENCES estado(id)
 );
+
+SELECT * FROM plantilla_formulario;
 
 CREATE TABLE documento_formulario (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
