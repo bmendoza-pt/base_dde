@@ -1849,7 +1849,7 @@ BEGIN
         ON i.id = pf.id_industria
 
     WHERE pf.id = p_id
-	order by pf
+	order by pf.id
     LIMIT 1;
 
 END $$
@@ -1890,6 +1890,31 @@ END $$
 DELIMITER ;
 
 CALL sp_listar_plantillas();
+
+-- //////////////////////////////////
+-- LISTAR ESTADO POR ID
+-- //////////////////////////////////
+
+DROP PROCEDURE IF EXISTS sp_listar_estado_plantilla_id;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_estado_plantilla_id( IN e_id BIGINT )
+BEGIN
+
+    SELECT
+        ep.id,
+        ep.nombre,
+        ep.activo
+    FROM estado_plantilla ep WHERE ep.id = e_id
+	order by ep.id
+    LIMIT 1;
+
+END $$
+
+DELIMITER ;
+
+CALL sp_listar_estado_plantilla_id(1);
 
 -- //////////////////////////////////
 -- LISTAR PLANTILLAS POR INDUSTRIA
