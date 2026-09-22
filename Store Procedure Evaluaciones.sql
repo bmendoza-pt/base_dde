@@ -1831,24 +1831,26 @@ DROP PROCEDURE IF EXISTS sp_listar_plantilla_id;
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_listar_plantilla_id(
-    IN p_id BIGINT
-)
+CREATE PROCEDURE sp_listar_plantilla_id( IN p_id BIGINT )
 BEGIN
 
     SELECT
         pf.id,
         pf.nombre,
+        pf.id_estado,
         pf.id_industria,
         i.nombre AS industria,
+        e.nombre AS estado,
         pf.activo
-
     FROM plantilla_formulario pf
 
     INNER JOIN industria i
         ON i.id = pf.id_industria
 
-    WHERE pf.id = p_id
+    LEFT JOIN estado_plantilla e
+        ON e.id = pf.id_estado
+
+    WHERE pf.id = p_id AND pf.activo = 1
 	order by pf.id
     LIMIT 1;
 
@@ -1856,8 +1858,7 @@ END $$
 
 DELIMITER ;
 
-CALL sp_listar_plantilla_id(9);
-
+CALL sp_listar_plantilla_id(1);
 
 -- //////////////////////////////////
 -- LISTAR PLANTILLAS
@@ -1872,18 +1873,60 @@ BEGIN
     SELECT
         pf.id,
         pf.nombre,
+        pf.id_estado,
         pf.id_industria,
         i.nombre AS industria,
+        e.nombre AS estado,
         pf.activo
-
     FROM plantilla_formulario pf
 
     INNER JOIN industria i
         ON i.id = pf.id_industria
 
+    LEFT JOIN estado_plantilla e
+        ON e.id = pf.id_estado
+
     WHERE pf.activo = 1
 
     ORDER BY pf.id;
+
+
+END $$
+
+DELIMITER ;
+
+CALL sp_listar_plantillas();
+
+-- //////////////////////////////////
+-- LISTAR PLANTILLAS
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_plantillas_finalizadas;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_listar_plantillas_finalizadas()
+BEGIN
+
+    SELECT
+        pf.id,
+        pf.nombre,
+        pf.id_estado,
+        pf.id_industria,
+        i.nombre AS industria,
+        e.nombre AS estado,
+        pf.activo
+    FROM plantilla_formulario pf
+
+    INNER JOIN industria i
+        ON i.id = pf.id_industria
+
+    LEFT JOIN estado_plantilla e
+        ON e.id = pf.id_estado
+
+    WHERE pf.activo = 1 and pf.id_estado = 3
+
+    ORDER BY pf.id;
+
 
 END $$
 

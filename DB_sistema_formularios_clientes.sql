@@ -20,6 +20,8 @@ CREATE TABLE usuarios (
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
 
+insert into usuarios (nombre, correo, contrasena, fecha_creacion, id_usuario_creacion) value('admin', 'admin@protecciontotal.gt', '$2b$10$9rouFL8TEojp2lFD/d7qKeWBOVi4yttYLdoKgFUdISkRtWk.qp6Ue', now(), 1);
+
 CREATE TABLE departamento (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL,
@@ -127,6 +129,8 @@ CREATE TABLE rol (
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
 
+insert into rol(nombre) values('Super-Admin');
+
 CREATE TABLE usuario_rol (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_usuario BIGINT NOT NULL,
@@ -148,6 +152,8 @@ CREATE TABLE usuario_rol (
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
 
+insert into usuario_rol(id_usuario, id_rol) values(1,1);
+
 CREATE TABLE tipo_campo (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -162,7 +168,8 @@ CREATE TABLE tipo_campo (
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
 
-SELECT * FROM tipo_campo;
+INSERT INTO tipo_campo (nombre, activo, fecha_creacion) VALUES
+('Texto', 1, NOW()), ('Yes or No', 1, NOW()), ('Textarea', 1, NOW()), ('Number', 1, NOW()), ('Decimal', 1, NOW()), ('Date', 1, NOW()), ('Time', 1, NOW()), ('Select', 1, NOW()), ('Radio', 1, NOW()), ('Checkbox', 1, NOW()), ('Multi Select', 1, NOW());
 
 CREATE TABLE estado_plantilla (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -179,9 +186,11 @@ CREATE TABLE estado_plantilla (
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
 
+INSERT INTO estado_plantilla (nombre) values('Nueva');
+
 CREATE TABLE plantilla_formulario (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    id_industria BIGINT NOT NULL,
+    id_industria BIGINT NOT NULL DEFAULT 1,
     id_estado BIGINT,
     nombre VARCHAR(150) NOT NULL,
     activo TINYINT DEFAULT 1,
@@ -197,7 +206,7 @@ CREATE TABLE plantilla_formulario (
 	CONSTRAINT fk_plantilla_usuario_actualizacion
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id),
 	CONSTRAINT fk_plantilla_estado
-		FOREIGN KEY (id_estado) REFERENCES estado(id)
+		FOREIGN KEY (id_estado) REFERENCES estado_plantilla(id)
 );
 
 SELECT * FROM plantilla_formulario;
@@ -309,6 +318,8 @@ CREATE TABLE tipo_evento (
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
 
+SELECT * FROM tipo_evento;
+
 CREATE TABLE tipo_accion (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -323,6 +334,8 @@ CREATE TABLE tipo_accion (
 	CONSTRAINT fk_tipo_accion_usuario_actualizacion
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
+
+SELECT * FROM tipo_accion;
 
 CREATE TABLE evento_campo_formulario (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
