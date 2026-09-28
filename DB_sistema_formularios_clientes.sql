@@ -71,6 +71,8 @@ CREATE TABLE industria (
         FOREIGN KEY (id_usuario_actualizacion) REFERENCES usuarios(id)
 );
 
+SELECT * FROM industria;
+
 CREATE TABLE cliente (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL,
@@ -258,6 +260,7 @@ CREATE TABLE campo_formulario (
     id_seccion BIGINT NOT NULL,
     codigo VARCHAR(100) NOT NULL,
     etiqueta VARCHAR(500) NOT NULL,
+    peso DECIMAL(5,2) DEFAULT 0,
     texto_ayuda VARCHAR(500),
     texto_guia VARCHAR(255),
     id_tipo_campo BIGINT NOT NULL,

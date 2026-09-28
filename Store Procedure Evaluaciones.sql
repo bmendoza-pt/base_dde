@@ -1713,6 +1713,7 @@ CREATE PROCEDURE sp_crear_campo(
     IN p_id_seccion BIGINT,
     IN p_codigo VARCHAR(100),
     IN p_etiqueta VARCHAR(500),
+    IN p_peso DECIMAL(5,2),
     IN p_texto_ayuda VARCHAR(500),
     IN p_texto_guia VARCHAR(255),
     IN p_id_tipo_campo BIGINT,
@@ -1727,6 +1728,7 @@ BEGIN
         id_seccion,
         codigo,
         etiqueta,
+        peso,
         texto_ayuda,
         texto_guia,
         id_tipo_campo,
@@ -1739,6 +1741,7 @@ BEGIN
         p_id_seccion,
         p_codigo,
         p_etiqueta,
+        p_peso,
         p_texto_ayuda,
         p_texto_guia,
         p_id_tipo_campo,
@@ -1772,6 +1775,7 @@ CREATE PROCEDURE sp_actualizar_campo(
     IN p_requerido TINYINT,
     IN p_valor_minimo DECIMAL(12,2),
     IN p_valor_maximo DECIMAL(12,2),
+    IN p_peso DECIMAL(5,2),
     IN p_orden_visualizacion INT
 )
 BEGIN
@@ -1781,6 +1785,7 @@ BEGIN
     SET
         codigo = p_codigo,
         etiqueta = p_etiqueta,
+        peso = p_peso,
         texto_ayuda = p_texto_ayuda,
         texto_guia = p_texto_guia,
         id_tipo_campo = p_id_tipo_campo,
@@ -1898,7 +1903,7 @@ DELIMITER ;
 CALL sp_listar_plantillas();
 
 -- //////////////////////////////////
--- LISTAR PLANTILLAS
+-- LISTAR PLANTILLAS FINALIZADAS
 -- //////////////////////////////////
 DROP PROCEDURE IF EXISTS sp_listar_plantillas_finalizadas;
 
@@ -1923,7 +1928,7 @@ BEGIN
     LEFT JOIN estado_plantilla e
         ON e.id = pf.id_estado
 
-    WHERE pf.activo = 1 and pf.id_estado = 3
+    WHERE pf.activo = 1 and pf.id_estado != 1
 
     ORDER BY pf.id;
 
@@ -2068,6 +2073,27 @@ END $$
 DELIMITER ;
 
 CALL sp_cambiar_activo_plantilla(2,0);
+
+-- //////////////////////////////////
+-- CAMBIAR ESTADO PLANTILLA
+-- //////////////////////////////////
+
+DROP PROCEDURE IF EXISTS sp_cambiar_estado_plantilla;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_cambiar_estado_plantilla(IN p_id BIGINT, IN p_id_estado BIGINT )
+BEGIN
+
+    UPDATE plantilla_formulario
+    SET id_estado = p_id_estado
+    WHERE id = p_id;
+
+END $$
+
+DELIMITER ;
+
+
 -- =====================================================
 -- DOCUMENTOS
 -- =====================================================
@@ -3451,6 +3477,81 @@ END $$
 DELIMITER ;
 
 CALL sp_cambiar_activo_evaluacion(2, 0);
+
+
+DELIMITER $$
+
+
+-- //////////////////////////////////
+-- LISTAR EVALUACIONES POR USUARIO
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_listar_evaluaciones_usuario;
+
+CREATE PROCEDURE sp_listar_evaluaciones_usuario( IN p_id_usuario BIGINT, IN p_es_admin BOOLEAN )
+BEGIN
+
+    IF p_es_admin = 1 THEN
+
+        SELECT
+            e.id,
+            e.fecha_evaluacion,
+            e.estatus,
+            e.puntaje_total,
+            e.nivel_riesgo,
+            c.id AS id_cliente,
+            c.nombre AS cliente,
+            s.id AS id_sucursal,
+            s.nombre AS sucursal,
+            p.id AS id_plantilla,
+            p.nombre AS plantilla
+
+        FROM evaluacion e
+        
+        INNER JOIN sucursal s
+            ON s.id = e.id_sucursal
+        INNER JOIN cliente c
+            ON c.id = s.id_cliente
+        INNER JOIN plantilla p
+            ON p.id = e.id_plantilla
+
+        ORDER BY e.fecha_evaluacion DESC;
+
+    ELSE
+
+        SELECT
+            e.id,
+            e.fecha_evaluacion,
+            e.estatus,
+            e.puntaje_total,
+            e.nivel_riesgo,
+            c.id AS id_cliente,
+            c.nombre AS cliente,
+            s.id AS id_sucursal,
+            s.nombre AS sucursal,
+            p.id AS id_plantilla,
+            p.nombre AS plantilla
+
+        FROM evaluacion e
+        
+        INNER JOIN sucursal s
+            ON s.id = e.id_sucursal
+        INNER JOIN cliente c
+            ON c.id = s.id_cliente
+        INNER JOIN plantilla p
+            ON p.id = e.id_plantilla
+
+        WHERE e.id_evaluador = p_id_usuario
+
+        ORDER BY e.fecha_evaluacion DESC;
+
+    END IF;
+
+
+END$$
+
+DELIMITER ;
+
+
 -- =====================================================
 -- RESPUESTAS DE EVALUACION
 -- =====================================================
@@ -3826,3 +3927,87 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- //////////////////////////////////
+-- RESUMEN EVALUACION
+-- //////////////////////////////////
+DROP PROCEDURE IF EXISTS sp_dashboard_evaluacion;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_dashboard_evaluacion(IN p_id_evaluacion BIGINT)
+BEGIN
+
+SELECT
+
+    -- Evaluación
+    e.id AS id_evaluacion,
+    e.fecha_creacion AS fecha_evaluacion,
+    e.estatus,
+    e.puntaje_total,
+    e.nivel_riesgo,
+
+    -- Cliente
+    c.id AS id_cliente,
+    c.nombre AS cliente,
+
+    -- Sucursal
+    s.id AS id_sucursal,
+    s.nombre AS sucursal,
+
+    -- Plantilla
+    p.id AS id_plantilla,
+    p.nombre AS plantilla,
+
+    -- Documento
+    d.id AS id_documento,
+    d.codigo AS codigo_documento,
+    d.nombre AS documento,
+
+    -- Sección
+    sec.id AS id_seccion,
+    sec.nombre AS seccion,
+
+    -- Campo
+    campo.id AS id_campo,
+    campo.codigo,
+    campo.etiqueta,
+    campo.peso,
+    tc.nombre AS tipo_campo,
+
+    -- Respuesta
+    r.id AS id_respuesta,
+    r.valor_texto,
+    r.valor_numero,
+    r.valor_booleano,
+    r.valor_fecha,
+
+    -- Opción seleccionada
+    op.id AS id_opcion,
+    op.valor AS opcion,
+    op.puntaje,
+
+    -- Cálculo dinámico
+    r.puntaje_ponderado
+
+FROM evaluacion e
+
+INNER JOIN sucursal s ON s.id = e.id_sucursal
+INNER JOIN cliente c ON c.id = s.id_cliente
+INNER JOIN plantilla_formulario p ON p.id = e.id_plantilla
+INNER JOIN documento_formulario d ON d.id_plantilla = p.id
+INNER JOIN seccion_formulario sec ON sec.id_documento = d.id
+INNER JOIN campo_formulario campo ON campo.id_seccion = sec.id
+INNER JOIN tipo_campo tc ON tc.id = campo.id_tipo_campo
+LEFT JOIN respuesta_evaluacion r ON r.id_evaluacion = e.id AND r.id_campo = campo.id
+LEFT JOIN opcion_formulario op ON op.id = r.id_opcion
+
+WHERE e.id = p_id_evaluacion
+
+ORDER BY d.orden_visualizacion, sec.orden_visualizacion, campo.orden_visualizacion;
+
+END$$
+
+DELIMITER ;
+
+CALL sp_dashboard_evaluacion(7);
